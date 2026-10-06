@@ -1669,6 +1669,10 @@ html[data-theme="light"] .first-use-notice-text{color:#4c4942;border-top-color:#
 html[data-theme="light"] .first-use-notice-item{border-bottom-color:#c9c2b4}
 html[data-theme="light"] .first-use-notice-item a{color:#1c1b18}
 html[data-theme="light"] .first-use-notice-window header button,html[data-theme="light"] .first-use-notice-window footer button{border-color:#a9a294;background:#eae4d8;color:#1c1b18}
+html[data-theme="light"] .edge-drawer-swipe-hint{color:rgba(28,27,24,.74)}
+html[data-theme="light"] .edge-drawer-swipe-hint>span:first-child{background:#f5f1ea}
+html[data-theme="light"] .edge-drawer-swipe-hint:hover,html[data-theme="light"] .edge-drawer-swipe-hint:focus-visible{color:#1c1b18}
+html[data-theme="light"] .edge-drawer-swipe-hint:focus-visible{filter:drop-shadow(0 0 4px rgba(28,27,24,.38))}
 html[data-theme="light"] .apple-refresh-dialog{background:#f5f1ea;color:#1c1b18;border-color:rgba(0,0,0,.12)}
 html[data-theme="light"] .apple-refresh-window>header,html[data-theme="light"] .apple-refresh-faq{background:#eae4d8}
 html[data-theme="light"] .apple-refresh-window h1,html[data-theme="light"] .apple-refresh-faq-item h2,html[data-theme="light"] .apple-refresh-faq-item strong{color:#1c1b18}
