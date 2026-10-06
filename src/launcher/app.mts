@@ -179,13 +179,20 @@ import {
   launcherOptionsHistoryOperation,
   normalizeRoomCode as mpNormalizeRoomCode,
   playerRouteHistoryOperation,
+  resolveRoomInvite,
   returnToRoomHistoryOperation,
+  roomCodeFromUrl,
   roomRouteHistoryOperation,
   roomPanelHistoryOperation,
   roomSettingsHistoryOperation,
   routedProductFromUrl,
   touchLayoutEditorHistoryOperation,
 } from "./route-state.mjs";
+import {
+  ROOM_INVITE_KEY,
+  encodeRoomInvite,
+  roomInviteFromUrl,
+} from "./room-invite.mjs";
 import type {
   GameId,
   ProductFeatureId,
@@ -594,8 +601,9 @@ function mpReconnectLobbyNow() {
   mpConnectLobby(true);
 }
 
-let mpLobbyIntent = new URL(location.href).searchParams.get("lobbyAction") || "";
-let mpDirectoryAutoSeat = new URL(location.href).searchParams.get("fromLobby") === "1" && mpLobbyIntent === "join";
+const mpInitialInvite = resolveRoomInvite(location.href);
+let mpLobbyIntent = mpInitialInvite?.a ?? "";
+let mpDirectoryAutoSeat = mpInitialInvite?.f === true && mpLobbyIntent === "join";
 let mpLobbyStopped = false;
 let mpDirectorySupported = false;
 let mpControlModesSupported = false;
@@ -671,7 +679,15 @@ function mpConnectLobby(reconnecting = false) {
       if (record(message.roomDirectory)?.controlModes === true) mpControlModesSupported = true;
       mpLobbyIntent = "join";
       const route = new URL(location.href);
-      if (route.searchParams.has("lobbyAction")) {
+      const invite = roomInviteFromUrl(route);
+      if (invite && (invite.a || invite.p !== undefined || invite.d !== undefined || invite.v || invite.c)) {
+        // Settle the room URL: keep product/room/fromLobby, drop the one-shot
+        // create intent and initial settings so a reload cannot re-create.
+        route.searchParams.set(ROOM_INVITE_KEY, encodeRoomInvite({
+          g: invite.g, r: invite.r, ...(invite.f ? { f: true } : {}),
+        }));
+        history.replaceState(history.state, "", route);
+      } else if (route.searchParams.has("lobbyAction")) {
         route.searchParams.delete("lobbyAction");
         route.searchParams.delete("lobbyPlayers");
         route.searchParams.delete("lobbyDifficulty");
@@ -899,6 +915,7 @@ function th09LeaveNetworkRoom() {
   const url = new URL(location.href);
   url.searchParams.set("game", state.game);
   url.searchParams.delete(mpRoomUrlKey);
+  url.searchParams.delete(ROOM_INVITE_KEY);
   history.replaceState(history.state, "", url);
   th09CloseNetworkOverlay(true);
   render();
@@ -4976,7 +4993,7 @@ async function closePlayerView(fromHistory = false, { skipSync = false, returnTo
     state.hasSelection = true;
     state.runtimeVariant = "multiplayer";
     const roomCode = mpUiState.room.code;
-    if (fromHistory && mpNormalizeRoomCode(new URL(location.href).searchParams.get(mpRoomUrlKey)) !== roomCode) {
+    if (fromHistory && roomCodeFromUrl(location.href) !== roomCode) {
       // Back was pressed while the game covered its room. Restore the room
       // entry without consuming the options entry beneath it.
       history.forward();
@@ -5046,7 +5063,7 @@ window.addEventListener("popstate", async event => {
     return;
   }
   if (mpUiState.room) {
-    const routedRoom = mpNormalizeRoomCode(new URL(location.href).searchParams.get(mpRoomUrlKey));
+    const routedRoom = roomCodeFromUrl(location.href);
     if (!routedRoom || routedRoom !== mpUiState.room.code) {
       mpLeaveRoom();
       return;
@@ -7236,7 +7253,7 @@ function mpClearPersistedRoom() {
   mpSyncRoomUrl("");
 }
 
-function mpFromDirectory() { return new URL(location.href).searchParams.get("fromLobby") === "1"; }
+function mpFromDirectory() { return resolveRoomInvite(location.href)?.f === true; }
 function mpReturnToDirectory() {
   const target = new URL("lobby.html", location.href);
   target.searchParams.set("game", state.product);
@@ -7246,7 +7263,8 @@ function mpReturnToDirectory() {
 }
 
 function mpRestoreRoomFromLocation() {
-  const code = mpNormalizeRoomCode(new URL(location.href).searchParams.get(mpRoomUrlKey));
+  const invite = resolveRoomInvite(location.href);
+  const code = mpNormalizeRoomCode(invite?.r ?? "");
   if (!code) return false;
   const routedProduct = isMultiplayerProduct(state.product) ? state.product : DEFAULT_MULTIPLAYER_PRODUCT_ID;
   // A room URL opened directly has no guaranteed same-document home entry.
@@ -7265,16 +7283,15 @@ function mpRestoreRoomFromLocation() {
     playerCounts: mpPlayerCounts(routedProduct),
     difficulties: multiplayerConfigForProduct(routedProduct)?.difficulties || [],
   });
-  const requested = new URL(location.href).searchParams;
-  const createdInDirectory = mpFromDirectory() && requested.get("lobbyAction") === "create";
-  const requestedCount = Number(requested.get("lobbyPlayers")) as 2 | 3;
-  const playerCount = saved?.room.playerCount ?? (createdInDirectory && mpPlayerCounts(routedProduct).includes(requestedCount) ? requestedCount : mpDefaultPlayerCount(routedProduct));
-  const difficulty = saved?.room.difficulty ?? (createdInDirectory ? Math.max(0, Math.min((multiplayerConfigForProduct(routedProduct)?.difficulties.length || 1) - 1, Math.trunc(Number(requested.get("lobbyDifficulty")) || 0))) : 1);
+  const requestedCount = invite?.p;
+  const createdInDirectory = mpFromDirectory() && invite?.a === "create";
+  const playerCount = saved?.room.playerCount ?? (createdInDirectory && requestedCount !== undefined && mpPlayerCounts(routedProduct).includes(requestedCount as 2 | 3) ? (requestedCount as 2 | 3) : mpDefaultPlayerCount(routedProduct));
+  const difficulty = saved?.room.difficulty ?? (createdInDirectory ? Math.max(0, Math.min((multiplayerConfigForProduct(routedProduct)?.difficulties.length || 1) - 1, Math.trunc(invite?.d ?? 0))) : 1);
   const seat = saved?.seat ?? (createdInDirectory ? 0 : null);
   mpUiState.room = {
     code, playerCount, difficulty, created: createdInDirectory || !!saved?.room.created,
-    visibility: saved?.room.visibility ?? (requested.get("lobbyVisibility") === "private" ? "private" : "public"),
-    disableCheatMovement: saved?.room.disableCheatMovement ?? requested.get("lobbyDisableCheatMovement") === "1",
+    visibility: saved?.room.visibility ?? (invite?.v === "private" ? "private" : "public"),
+    disableCheatMovement: saved?.room.disableCheatMovement ?? invite?.c === true,
     challengeMode:saved?.room.challengeMode??false,prankMode:false,
     seats: null, synced: false, connection: "connecting",
   };
@@ -9381,7 +9398,7 @@ if (mpRestoreRoomFromLocation()) {
 if (!mpUiState.room && !state.launched && !productEnabled(state.product)) state.hasSelection = false;
 render(); setTranslatedStatus("status.selectGame");
 bootWatchdog?.ready?.();
-const launcherRoomRoute = !!mpNormalizeRoomCode(new URL(location.href).searchParams.get(mpRoomUrlKey));
+const launcherRoomRoute = !!roomCodeFromUrl(location.href);
 const loadEntryNotices = () => {
   if (lobbyOptionsEmbed) return;
   if (!launcherRoomRoute && !debugHarness && !touchPreview) {
