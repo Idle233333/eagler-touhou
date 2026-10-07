@@ -1779,6 +1779,19 @@ html[data-theme="light"] .mp-unseated-note{color:#6b665c}
 html[data-theme="light"] .mp-local-character{background:radial-gradient(circle at 40% 34%,rgba(20,19,17,.05),transparent 29%),linear-gradient(145deg,#eae4d8,#ded7c9)}
 html[data-theme="light"] .mp-seat-drop button{color:#6b665c}
 
+/* Quick chat (light theme). The panel is hardcoded for the dark room (white text
+   on near-black chips), so day mode needs a light palette: dark text on the same
+   warm chips as the rest of the room UI, with the focus/accent colours swapped. */
+html[data-theme="light"] .mp-quick-chat{color:#1c1b18}
+html[data-theme="light"] .mp-quick-chat button{background:#ded7c9;color:#1c1b18}
+html[data-theme="light"] .mp-quick-chat button:focus-visible{outline-color:#bd4438}
+html[data-theme="light"] .mp-quick-chat-mute{color:#6b665c!important}
+html[data-theme="light"] .mp-quick-chat-log{text-shadow:none}
+html[data-theme="light"] .mp-quick-chat-log strong{color:#3f6d3a}
+html[data-theme="light"] .mp-quick-chat-prompt{background:rgba(245,241,234,.92)!important;box-shadow:0 4px 14px rgba(0,0,0,.12),inset 0 0 0 1px rgba(20,19,17,.08)!important}
+html[data-theme="light"] .mp-quick-chat-picker{background:rgba(245,241,234,.98)}
+html[data-theme="light"] .mp-quick-chat-picker p{color:#6b665c}
+
 /* Multiplayer room header icons + status text (light theme). The dark room lifts
    the black icon SVGs with a brightness filter, so in light theme that filter has
    to be dropped or the copy/gear icons wash out to near-invisible pale pink on
