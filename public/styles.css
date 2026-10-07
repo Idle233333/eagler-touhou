@@ -1618,12 +1618,6 @@ body:has(#touchLayoutEditor:not([hidden]))>.mizuki-select-menu .mizuki-select-it
 .mp-quick-chat-picker button{text-align:left}.mp-quick-chat-picker p{margin:4px;color:#aeb4a7}
 
 
-/* Dialogs, menus, toasts and overlays (light theme) */
-
-/* Multiplayer room view (light theme) */
-
-/* Touch layout editor, touch help, touch HUD (light theme) */
-
 /* Unified touch controls. */
 
 .player.touch-enabled{--touch-surface:rgba(23,23,26,.72);--touch-outline:rgba(255,255,255,.09)}
