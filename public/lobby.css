@@ -175,3 +175,17 @@ html[data-theme="light"] .lobby-dialog{background:#f5f1ea;color:#1c1b18}
 html[data-theme="light"] .lobby-field :is(input,select){background:#eae4d8;color:#1c1b18}
 html[data-theme="light"] .lobby-back{color:#1c1b18}
 html[data-theme="light"] .lobby-back img{filter:none}
+
+/* Light-theme gaps: the survey notice and the hover states were written for the
+   dark palette only. The notice hardcodes a dark background while its text uses
+   --lobby-paper (dark in light theme), so the label washed out to ~1.2:1; and
+   the lone @media(hover:hover) block has no light override, so buttons flipped
+   to dark/near-white on hover. Re-assert both with light values. */
+html[data-theme="light"] .lobby-survey-notice{background:#f1ece2;border-color:rgba(169,46,76,.2)}
+@media(hover:hover){
+ html[data-theme="light"] .lobby-page .lobby-button:not(:disabled):hover{background:#dad3c4}
+ html[data-theme="light"] .lobby-page .lobby-primary:not(:disabled):hover,
+ html[data-theme="light"] .lobby-page .lobby-join:not(:disabled):hover{background:#f7d7e1}
+ html[data-theme="light"] .lobby-page .lobby-filter:not([aria-pressed=true]):hover{background:#dad3c4}
+ html[data-theme="light"] .lobby-support-link:hover{color:var(--lobby-wine)}
+}

@@ -1772,6 +1772,15 @@ html[data-theme="light"] .mp-unseated-note{color:#6b665c}
 html[data-theme="light"] .mp-local-character{background:radial-gradient(circle at 40% 34%,rgba(20,19,17,.05),transparent 29%),linear-gradient(145deg,#eae4d8,#ded7c9)}
 html[data-theme="light"] .mp-seat-drop button{color:#6b665c}
 
+/* Multiplayer room header icons + status text (light theme). The dark room lifts
+   the black icon SVGs with a brightness filter, so in light theme that filter has
+   to be dropped or the copy/gear icons wash out to near-invisible pale pink on
+   the light bar; the green "connected" label needs a darker green for contrast. */
+html[data-theme="light"] #mpRoomView .room-icon{filter:none!important}
+html[data-theme="light"] #mpRoomView .mp-room-connection.connected{color:#3f6d3a!important}
+html[data-theme="light"] #mpRoomView .mp-room-guide-open,
+html[data-theme="light"] #mpRoomView .mp-seat-glyph{color:#bd4438!important}
+
 /* Touch layout editor, touch help, touch HUD (light theme) */
 html[data-theme="light"] #touchLayoutEditor{background:#f5f1ea;border-color:rgba(20,19,17,.12);color:#1c1b18;box-shadow:0 14px 42px rgba(0,0,0,.16)}
 html[data-theme="light"] .touch-layout-setting-row{border-top-color:#d8d1c4;color:#1c1b18}
