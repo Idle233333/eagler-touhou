@@ -1,3 +1,5 @@
+import {TH19_VERSUS_RULES,validTh19VersusRules} from '../../../common/contracts/th19-versus-rules.mjs';
+import {Th19SpectatorHistory} from './th19-spectator.mjs';
 import {createNicknameService} from './nickname-service.mjs';
 import {createNicknameRequestGuard} from './nickname-request-guard.mjs';
 import {normalizePublicNickname} from '../../../common/contracts/public-nickname.mjs';
@@ -124,8 +126,6 @@ function envValue(primary, legacyNames, fallback = '') {
 // read-only compatibility aliases for deployments created before Multiplayer
 // became a shared product profile.
 const host = envValue('EAGLER_NETPLAY_RELAY_HOST', ['TH07_RELAY_HOST'], '0.0.0.0');
-const releaseChannel = process.env.EAGLER_RELEASE_CHANNEL || 'stable';
-if (!['stable', 'beta'].includes(releaseChannel)) throw new Error('EAGLER_RELEASE_CHANNEL must be stable or beta');
 const port = Number.parseInt(
   envValue('EAGLER_NETPLAY_RELAY_PORT', ['TH07_RELAY_PORT'], '18142'),
   10,
@@ -384,6 +384,7 @@ function getRoom(id, socket) {
       lobby: {
         playerCount: defaultPlayerCount(multiplayer),
         difficulty: 1,
+        ...(id.startsWith('th19mp-')?{th19Rules:[...TH19_VERSUS_RULES]}:{}),
         visibility: 'public',
         disableCheatMovement: false,
         ...(id.startsWith('th09mp-') ? {disableLocalChargePriority:false} : {}),
@@ -467,7 +468,7 @@ function maybeDeleteRun(room, runId, run) {
 function startSpectatorGrace(roomId, room, runId, run) {
   if (run.spectatorGraceTimer) clearTimeout(run.spectatorGraceTimer);
   run.spectatorTimeline =
-    process.env.EAGLER_NETPLAY_TH09_SPECTATOR_TIMELINE === '1' && roomId.startsWith('th09mp-');
+    roomId.startsWith('th19mp-') || process.env.EAGLER_NETPLAY_TH09_SPECTATOR_TIMELINE === '1' && roomId.startsWith('th09mp-');
   run.spectatorAdmissionOpen = true;
   run.onSpectatorAvailabilityChange = run.spectatorTimeline ? () => roomDirectory.changed() : null;
   clearSpectatorHistory(run);
@@ -487,6 +488,28 @@ function startSpectatorGrace(roomId, room, runId, run) {
     maybeDeleteRun(room, runId, run);
     maybeDeleteRoom(roomId, room);
   }, spectatorConnectGraceMs);
+}
+
+function acceptTh19SpectatorPayload(roomId,runId,room,run,payload){
+ if(!roomId.startsWith('th19mp-'))return false;
+ if(run.spectatorHistoryUnavailable)return true;
+ try{
+  const tape=run.th19Spectator??=new Th19SpectatorHistory();
+  const row=tape.accept(payload);if(!row)return true;
+  if(row.kind==='begin'&&!validTh19VersusRules(row.config.rules))throw Error('invalid TH19 spectator rules');
+  run.spectatorTimeline=true;run.spectatorHistory=tape.history;run.spectatorHistoryBytes=tape.bytes;
+  run.spectatorComplete=tape.ended;run.spectatorAdmissionOpen=!tape.ended;
+  for(const [id,target] of run.spectatorClients)if(!target.spectatorReplaying)sendSpectatorPayload(target,payload,roomId,runId,id);
+  if(row.kind==='begin'){
+   roomDirectory.changed();
+   for(const id of room.lobby.spectators.keys()){const lobby=room.lobbyClients.get(id);if(lobby)sendLobby(lobby,{type:'spectator-start',serial:room.lobby.startSerial,room:lobbySnapshot(room)});}
+  }
+ }catch(error){
+  run.spectatorAdmissionOpen=false;run.spectatorHistoryUnavailable=true;
+  for(const socket of run.spectatorClients.values())socket.close(1008,'invalid TH19 spectator stream');
+  console.log(`TH19 SPECTATOR STOP room=${roomId} run=${runId} ${error.message}`);
+ }
+ return true;
 }
 
 function sendSpectatorPayload(socket, payload, roomId, runId, spectatorId) {
@@ -881,6 +904,7 @@ function lobbySnapshot(room) {
     visibility: room.lobby.visibility,
     disableCheatMovement: room.lobby.disableCheatMovement,
     ...(room.id.startsWith('th09mp-') ? {disableLocalChargePriority:room.lobby.disableLocalChargePriority} : {}),
+    ...(room.id.startsWith('th19mp-')?{th19Rules:[...room.lobby.th19Rules]}:{}),
     ...(room.th15 ? { chapterThreshold: room.lobby.chapterThreshold } : {}),
     challengeMode: room.lobby.challengeMode,
     prankMode: room.lobby.prankMode,
@@ -1001,6 +1025,7 @@ function handleLobbyConnection(socket, roomId, clientId, memberId, intent, initi
     socket.close(4007, "invalid settings");
     return;
   }
+  if(initialPolicy?.th19Rules!==undefined&&(!roomId.startsWith('th19mp-')||!validTh19VersusRules(initialPolicy.th19Rules))){sendLobby(socket,{type:'error',error:'invalid TH19 versus rules'});socket.close(4007,'invalid settings');return;}
   const existing = rooms.get(roomId);
   if (!existing && intent !== 'join' && !abuseGuard.canCreateRoom(socket.relayAddress)) {
     rejectRoomCreation(socket);
@@ -1025,6 +1050,7 @@ function handleLobbyConnection(socket, roomId, clientId, memberId, intent, initi
   const room = getRoom(roomId, socket);
   if (!room) return;
   if (!existing && intent === 'create') {
+    if(room.id.startsWith('th19mp-'))room.lobby.th19Rules=[...(initialPolicy?.th19Rules??TH19_VERSUS_RULES)];
     room.lobby.visibility = initialPolicy?.visibility === 'private' ? 'private' : 'public';
     room.lobby.disableCheatMovement = initialPolicy?.disableCheatMovement === true;
     if(room.id.startsWith('th09mp-'))room.lobby.disableLocalChargePriority=initialPolicy?.disableLocalChargePriority===true;
@@ -1493,6 +1519,8 @@ function handleLobbyConnection(socket, roomId, clientId, memberId, intent, initi
         sendLobby(socket, { type: 'state', room: lobbySnapshot(room) });
         return;
       }
+      if(message.th19Rules!==undefined&&(!room.id.startsWith('th19mp-')||!validTh19VersusRules(message.th19Rules))){sendLobby(socket,{type:'error',error:'invalid TH19 versus rules'});return;}
+      const th19Rules=message.th19Rules??room.lobby.th19Rules;
       const playerCount = Number(message.playerCount);
       if (!validPlayerCount(room.multiplayer, playerCount)) {
         sendLobby(socket, { type: 'error', error: 'invalid player count' });
@@ -1539,6 +1567,7 @@ function handleLobbyConnection(socket, roomId, clientId, memberId, intent, initi
       const prankMode = false;
       room.lobby.visibility = visibility;
       if (
+        (room.id.startsWith('th19mp-')&&JSON.stringify(room.lobby.th19Rules)!==JSON.stringify(th19Rules)) ||
         room.lobby.playerCount !== playerCount ||
         room.lobby.difficulty !== difficulty ||
         room.lobby.disableCheatMovement !== disableCheatMovement ||
@@ -1548,6 +1577,7 @@ function handleLobbyConnection(socket, roomId, clientId, memberId, intent, initi
         (room.th15 && room.lobby.chapterThreshold !== chapterThreshold)
       ) {
         invalidateLobbyReady(room);
+        if(room.id.startsWith('th19mp-'))room.lobby.th19Rules=[...th19Rules];
         room.lobby.disableCheatMovement = disableCheatMovement;
         if(room.id.startsWith('th09mp-'))room.lobby.disableLocalChargePriority=disableLocalChargePriority;
         room.lobby.challengeMode = challengeMode;
@@ -1658,7 +1688,8 @@ function handleLobbyConnection(socket, roomId, clientId, memberId, intent, initi
         predictionReserve < 1 ||
         predictionReserve > 2 ||
         (message.predictionReserve !== undefined && !adonisSupported) ||
-        (adonisMode !== 0 && !adonisSupported) ||
+        (adonisMode === 1 && !room.multiplayer?.inputTiming) ||
+        (adonisMode === 2 && !adonisSupported) ||
         (!timingPolicy.rollback &&
           (adonisMode !== 1 ||
             (message.predictionLimit !== undefined && message.predictionLimit !== 0))) ||
@@ -1895,11 +1926,6 @@ server.on('connection', (socket, request) => {
     socket.close(4008, 'connection limit');
     return;
   }
-  const requestedChannel = new URL(request.url || '/', 'http://relay.invalid').searchParams.get('channel') || 'stable';
-  if (requestedChannel !== releaseChannel) {
-    socket.close(1008, 'release channel mismatch');
-    return;
-  }
   roomDirectory.track(socket);
   const url = new URL(request.url || '/', `ws://${request.headers.host || 'localhost'}`);
   const memberId = url.searchParams.get('member') || '';
@@ -1929,6 +1955,7 @@ server.on('connection', (socket, request) => {
       visibility: url.searchParams.get('visibility'),
       disableCheatMovement: url.searchParams.get('disableCheatMovement') === '1',
       disableLocalChargePriority: url.searchParams.get('disableLocalChargePriority') === '1',
+      th19Rules: url.searchParams.has('th19Rules') ? (()=>{try{return JSON.parse(url.searchParams.get('th19Rules'));}catch{return null;}})() : undefined,
       chapterThreshold: url.searchParams.has('chapterThreshold')
         ? Number(url.searchParams.get('chapterThreshold'))
         : undefined,
@@ -2078,6 +2105,7 @@ server.on('connection', (socket, request) => {
       if (run.spectatorStopped) return;
       if (player !== 0) return;
       const payload = incoming.subarray(1);
+      if(acceptTh19SpectatorPayload(roomId,runId,room,run,payload))return;
       if (acceptCooperativeSpectatorPayload(roomId, runId, room, run, payload)) return;
       if (!run.spectatorAdmissionOpen && run.spectatorClients.size === 0 && !run.spectatorHistoryUnavailable) return;
       const th09Stream = roomId.startsWith('th09mp-') && run.playerCount === 2;

@@ -1,6 +1,6 @@
 # 文档总表
 
-共 409 份可读文档，包含贡献入口、适配说明、服务文档、生成报告、许可证和历史记录。由 `npm run docs:index` 更新。
+共 434 份可读文档，包含贡献入口、适配说明、服务文档、生成报告、许可证和历史记录。由 `npm run docs:index` 更新。
 
 项目说明按当前目录重写；许可证保留原文，生成报告由各自工具更新。原有 498 份 Markdown 的逐篇去向见[旧文档去向](history/INDEX.md)。
 
@@ -48,6 +48,7 @@
 | 作品入口 | [ports/th15-mp/README.md](../ports/th15-mp/README.md) | 東方紺珠伝 TH15 多人版 |
 | 作品入口 | [ports/th15/README.md](../ports/th15/README.md) | 東方紺珠伝 TH15 |
 | 作品入口 | [ports/th17/README.md](../ports/th17/README.md) | TH17 · 东方鬼形兽 |
+| 作品入口 | [ports/th19/README.md](../ports/th19/README.md) | 东方兽王园 TH19 |
 | 作品入口 | [ports/th20/README.md](../ports/th20/README.md) | TH20 · 东方锦上京 |
 | 作品适配表 | [ports/th06/ADAPTATION.md](../ports/th06/ADAPTATION.md) | th06 适配检查 |
 | 作品适配表 | [ports/th07/ADAPTATION.md](../ports/th07/ADAPTATION.md) | th07 适配检查 |
@@ -65,6 +66,7 @@
 | 作品适配表 | [ports/th15-mp/ADAPTATION.md](../ports/th15-mp/ADAPTATION.md) | th15 MP 适配检查 |
 | 作品适配表 | [ports/th15/ADAPTATION.md](../ports/th15/ADAPTATION.md) | th15 适配检查 |
 | 作品适配表 | [ports/th17/ADAPTATION.md](../ports/th17/ADAPTATION.md) | th17 适配检查 |
+| 作品适配表 | [ports/th19/ADAPTATION.md](../ports/th19/ADAPTATION.md) | th19 适配检查 |
 | 作品适配表 | [ports/th20/ADAPTATION.md](../ports/th20/ADAPTATION.md) | th20 适配检查 |
 | 作品源码文档 | [ports/th06/docs/DEVELOPMENT.md](../ports/th06/docs/DEVELOPMENT.md) | TH06 开发指南 |
 | 作品源码文档 | [ports/th06/docs/records/2026-10-26-spectator-browser.md](../ports/th06/docs/records/2026-10-26-spectator-browser.md) | 合作旁观状态验收 |
@@ -133,6 +135,8 @@
 | 作品源码文档 | [ports/th15-mp/docs/DEVELOPMENT.md](../ports/th15-mp/docs/DEVELOPMENT.md) | TH15 多人版开发指南 |
 | 作品源码文档 | [ports/th15/docs/DEVELOPMENT.md](../ports/th15/docs/DEVELOPMENT.md) | TH15 开发指南 |
 | 作品源码文档 | [ports/th17/docs/DEVELOPMENT.md](../ports/th17/docs/DEVELOPMENT.md) | TH17 开发指南 |
+| 作品源码文档 | [ports/th19/docs/DEVELOPMENT.md](../ports/th19/docs/DEVELOPMENT.md) | TH19 开发与构建 |
+| 作品源码文档 | [ports/th19/docs/REPLAY.md](../ports/th19/docs/REPLAY.md) | 旁观与扩展录像 |
 | 作品源码文档 | [ports/th20/docs/DEVELOPMENT.md](../ports/th20/docs/DEVELOPMENT.md) | TH20 开发指南 |
 | 公共库 | [common/README.md](../common/README.md) | common/ |
 | 公共库 | [common/browser/README.md](../common/browser/README.md) | 浏览器共享模块 |
@@ -258,6 +262,7 @@
 | 历史记录 | [archive/th12mp-public-20261028/cn129.md](../archive/th12mp-public-20261028/cn129.md) | 原主站入口同步 |
 | 历史记录 | [archive/th15-bomb-snapshot-memory-20261028/README.md](../archive/th15-bomb-snapshot-memory-20261028/README.md) | TH15 多人放雷快照内存峰值 |
 | 历史记录 | [archive/th15-boss-transfer-20261027/README.md](../archive/th15-boss-transfer-20261027/README.md) | TH15 多人：共享碎片与 Boss 入场输入 |
+| 历史记录 | [archive/th15-input-latency-20261105/README.md](../archive/th15-input-latency-20261105/README.md) | th15 MP 输入时序 |
 | 历史记录 | [archive/th15-main-rollback-20261028/README.md](../archive/th15-main-rollback-20261028/README.md) | TH15 多人回滚主站发布 |
 | 历史记录 | [archive/th15-rollback-20261026/th15-capture-index-20261026.md](../archive/th15-rollback-20261026/th15-capture-index-20261026.md) | TH15 多人快照：连续捕获索引 |
 | 历史记录 | [archive/th15-rollback-20261026/th15-multiplayer-shield-boss-20261026.md](../archive/th15-rollback-20261026/th15-multiplayer-shield-boss-20261026.md) | TH15 多人兔机护盾与 Boss 伤害 |
@@ -267,6 +272,7 @@
 | 历史记录 | [archive/th15-rollback-20261026/th15-rollback-stress-fix-20261026.md](../archive/th15-rollback-20261026/th15-rollback-stress-fix-20261026.md) | TH15 密集回滚修复与复测 |
 | 历史记录 | [archive/th15-rollback-20261026/th15-upstream-rebuild-20261026.md](../archive/th15-rollback-20261026/th15-upstream-rebuild-20261026.md) | TH15 多人实验分支与上游同步 |
 | 历史记录 | [archive/th15-rollback-latency-performance-20261031/README.md](../archive/th15-rollback-latency-performance-20261031/README.md) | TH15 多人回滚快照与本机呈现 |
+| 历史记录 | [archive/th15-rollback-performance-20261105/README.md](../archive/th15-rollback-performance-20261105/README.md) | th15 MP 回滚性能 |
 | 历史记录 | [archive/th15-stage-transition-rollback-20261028/README.md](../archive/th15-stage-transition-rollback-20261028/README.md) | TH15 多人回滚换面输入节奏 |
 | 历史记录 | [archive/th17-development-20261030/CHANGELOG.txt](../archive/th17-development-20261030/CHANGELOG.txt) | [2026-10-27] 鬼形兽 WEB 1.0.14 |
 | 历史记录 | [archive/th17-development-20261030/README-交付说明.md](../archive/th17-development-20261030/README-交付说明.md) | 鬼形兽 WEB 1.0.14 完整开发交付 · 2026-10-27 |
@@ -289,6 +295,24 @@
 | 历史记录 | [archive/th17-development-20261030/docs/当前开发状态.md](../archive/th17-development-20261030/docs/当前开发状态.md) | 鬼形兽 C++ 重建状态 |
 | 历史记录 | [archive/th17-development-20261030/docs/验收计划.md](../archive/th17-development-20261030/docs/验收计划.md) | 鬼形兽还原与发布验收 |
 | 历史记录 | [archive/th17-development-20261030/migration-validation.md](../archive/th17-development-20261030/migration-validation.md) | TH17 共用启动器接入验证 · 2026-10-30 |
+| 历史记录 | [archive/th19-all-shots-20261106/README.md](../archive/th19-all-shots-20261106/README.md) | 19 名角色普通射击检查 |
+| 历史记录 | [archive/th19-audio-20261105/README.md](../archive/th19-audio-20261105/README.md) | TH19 重复音效验收 |
+| 历史记录 | [archive/th19-character-grid-20261106/README.md](../archive/th19-character-grid-20261106/README.md) | Character-grid entrance |
+| 历史记录 | [archive/th19-development-20261104/README.md](../archive/th19-development-20261104/README.md) | TH19 源码交付来源 |
+| 历史记录 | [archive/th19-gameplay-20261105/README.md](../archive/th19-gameplay-20261105/README.md) | TH19 1.10c gameplay verification |
+| 历史记录 | [archive/th19-gameplay-20261105/multiplayer-splash.md](../archive/th19-gameplay-20261105/multiplayer-splash.md) | Multiplayer recording and splash damage |
+| 历史记录 | [archive/th19-gameplay-20261105/replay-audit.md](../archive/th19-gameplay-20261105/replay-audit.md) | Original ReplayInf evidence |
+| 历史记录 | [archive/th19-gameplay-20261105/replay-v2.md](../archive/th19-gameplay-20261105/replay-v2.md) | 联机录像与旁观重写验证 |
+| 历史记录 | [archive/th19-gameplay-20261105/round-fixes.md](../archive/th19-gameplay-20261105/round-fixes.md) | TH19 round and dense-spirit verification |
+| 历史记录 | [archive/th19-gameplay-20261105/story-rank-and-replay-audit.md](../archive/th19-gameplay-20261105/story-rank-and-replay-audit.md) | Story difficulty ranks and replay audit |
+| 历史记录 | [archive/th19-integration-20261105/README.md](../archive/th19-integration-20261105/README.md) | TH19 接入验收 |
+| 历史记录 | [archive/th19-junowen-interop-20261106/README.md](../archive/th19-junowen-interop-20261106/README.md) | Ju.N.Owen static interoperability audit |
+| 历史记录 | [archive/th19-match-policy-20261105/README.md](../archive/th19-match-policy-20261105/README.md) | TH19 统一生命与固定对局规则 |
+| 历史记录 | [archive/th19-menu-20261106/README.md](../archive/th19-menu-20261106/README.md) | TH19 menu navigation parity |
+| 历史记录 | [archive/th19-recording-20261105/README.md](../archive/th19-recording-20261105/README.md) | TH19 旁观、录像与容量验证 |
+| 历史记录 | [archive/th19-shot-impact-20261106/README.md](../archive/th19-shot-impact-20261106/README.md) | TH19 projectile impacts |
+| 历史记录 | [archive/th19-touch-charge-20261105/README.md](../archive/th19-touch-charge-20261105/README.md) | TH19 蓄力触屏按钮 |
+| 历史记录 | [archive/th19-versus-settings-20261105/README.md](../archive/th19-versus-settings-20261105/README.md) | TH19 专属输入与对局设置验收 |
 | 历史记录 | [archive/thprac-information-touch-20261027/README.md](../archive/thprac-information-touch-20261027/README.md) | THPrac 信息窗触控归属 |
 | 历史记录 | [archive/turn-fallback-20261028/README.md](../archive/turn-fallback-20261028/README.md) | TURN 选择同步 |
 | 历史记录 | [docs/history/INDEX.md](history/INDEX.md) | 旧文档去向 |
@@ -405,6 +429,7 @@
 | 许可证与声明 | [ports/th17/LICENSE-launcher.txt](../ports/th17/LICENSE-launcher.txt) | GNU GENERAL PUBLIC LICENSE |
 | 许可证与声明 | [ports/th17/THIRD-PARTY-NOTICES.txt](../ports/th17/THIRD-PARTY-NOTICES.txt) | Original game and assets: Team Shanghai Alice / ZUN. |
 | 许可证与声明 | [ports/th17/portable/sdl/third_party/miniaudio.LICENSE](../ports/th17/portable/sdl/third_party/miniaudio.LICENSE) | miniaudio |
+| 许可证与声明 | [ports/th19/portable/sdl/third_party/miniaudio.LICENSE](../ports/th19/portable/sdl/third_party/miniaudio.LICENSE) | miniaudio |
 | 许可证与声明 | [ports/th20/portable/sdl/third_party/miniaudio.LICENSE](../ports/th20/portable/sdl/third_party/miniaudio.LICENSE) | miniaudio |
 | 许可证与声明 | [services/relay/LICENSE](../services/relay/LICENSE) | LICENSE |
 | 许可证与声明 | [services/telemetry/LICENSE](../services/telemetry/LICENSE) | LICENSE |
